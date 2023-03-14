@@ -8,30 +8,59 @@ plugins {
     kotlin("plugin.jpa") version "1.7.22"
 }
 
-group = "com.danwoo"
-version = "0.0.1-SNAPSHOT"
+
 java.sourceCompatibility = JavaVersion.VERSION_17
 
-repositories {
-    mavenCentral()
-}
+allprojects {
+    group = "com.danwoo"
+    version = "0.0.1-SNAPSHOT"
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    runtimeOnly("com.mysql:mysql-connector-j")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+    repositories {
+        mavenCentral()
     }
 }
+
+subprojects {
+    apply(plugin = "kotlin")
+    apply(plugin = "kotlin-spring")
+    apply(plugin = "io.spring.dependency-management")
+
+    dependencies {
+        // JWT
+        implementation("com.auth0:java-jwt:3.19.2")
+
+        // Kotlin 로깅
+        implementation("io.github.microutils:kotlin-logging:1.12.5")
+
+        // Kotlin
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+        implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+        runtimeOnly("com.mysql:mysql-connector-j")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+    }
+
+
+    dependencyManagement {
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        }
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "17"
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+}
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
